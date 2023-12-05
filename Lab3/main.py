@@ -1,6 +1,7 @@
 import cv2 as cv
 import numpy as np
 import os
+import matplotlib.pyplot as plt
 
 def skin_detection_rgb(image):
     image = cv.cvtColor(image, cv.COLOR_BGR2HSV)
@@ -74,12 +75,11 @@ def task_b():
     #b)
     images_folder_truth_folder = "./GroundT_FamilyPhoto"
     images_folder = "Pratheepan_Dataset/FamilyPhoto"
-    accuracy, tp, tn, fp, fn = get_accuracy(images_folder, images_folder_truth_folder, skin_detection_rgb)
-    print("RGB Accuracy: ", accuracy)
-    print("RGB Confusion Matrix: ", create_confusion_matrix(tp, tn, fp, fn))
-
-    #the same for other methods
-    #display the statistics
+    for skin_detection_method in [skin_detection_rgb,skin_detection_rgb,skin_detection_hsv,skin_detection_ycrcb]:
+        accuracy, tp, tn, fp, fn = get_accuracy(images_folder, images_folder_truth_folder, skin_detection_rgb)
+        print(skin_detection_method.__name__)
+        print("RGB Accuracy: ", accuracy)
+        print("RGB Confusion Matrix: ", create_confusion_matrix(tp, tn, fp, fn))
 
 def task_c():
     #c)
@@ -98,7 +98,7 @@ def task_c():
     cv.waitKey(0)
 
 def main():
-    task_c()
+    task_b()
     
 
 if __name__ == '__main__':
