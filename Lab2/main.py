@@ -50,12 +50,15 @@ def custom_number_of_grey_shades(img, p):
 def floyd_steinberg_dithering(image, num_shades):
     height, width = image.shape[:2]
     output_image = np.zeros((height, width), dtype=np.uint8)
-    
+    palette = np.linspace(0,255,num_shades)
+    gray_image = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+
     for y in range(height):
         for x in range(width):
-            old_pixel = image[y, x]
-            new_pixel = np.round(old_pixel * (num_shades - 1) / 255)
-            output_image[y, x] = new_pixel
+            old_pixel = gray_image[y, x]
+            new_pixel = np.argmin(np.abs(old_pixel-palette))
+            output_image[y, x] = palette[new_pixel]
+
             quant_error = old_pixel - new_pixel * 255 // (num_shades - 1)
             
             if x < width - 1:
@@ -71,12 +74,15 @@ def floyd_steinberg_dithering(image, num_shades):
 def burkes_dithering(image, num_shades):
     height, width = image.shape[:2]
     output_image = np.zeros((height, width), dtype=np.uint8)
-    
+    palette = np.linspace(0,255,num_shades)
+    gray_image = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+
     for y in range(height):
         for x in range(width):
-            old_pixel = image[y, x]
-            new_pixel = np.round(old_pixel * (num_shades - 1) / 255)
-            output_image[y, x] = new_pixel
+            old_pixel = gray_image[y, x]
+            new_pixel = np.argmin(np.abs(old_pixel-palette))
+            output_image[y, x] = palette[new_pixel]
+
             quant_error = old_pixel - new_pixel * 255 // (num_shades - 1)
             
             if x < width - 1:
