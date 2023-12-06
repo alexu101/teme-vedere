@@ -50,56 +50,58 @@ def custom_number_of_grey_shades(img, p):
 def floyd_steinberg_dithering(image, num_shades):
     height, width = image.shape[:2]
     output_image = np.zeros((height, width), dtype=np.uint8)
-    palette = np.linspace(0,255,num_shades)
-    gray_image = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+    palette = np.linspace(0, 255, num_shades)
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     for y in range(height):
         for x in range(width):
             old_pixel = gray_image[y, x]
-            new_pixel = np.argmin(np.abs(old_pixel-palette))
+            new_pixel = np.argmin(np.abs(old_pixel - palette))
             output_image[y, x] = palette[new_pixel]
 
             quant_error = old_pixel - new_pixel * 255 // (num_shades - 1)
             
             if x < width - 1:
-                image[y, x + 1] += quant_error * 7 // 16
+                image[y, x + 1] += np.clip(quant_error * 7 // 16, 0, 255)
             if y < height - 1:
                 if x > 0:
-                    image[y + 1, x - 1] += quant_error * 3 // 16
-                image[y + 1, x] += quant_error * 5 // 16
+                    image[y + 1, x - 1] += np.clip(quant_error * 3 // 16, 0, 255)
+                image[y + 1, x] += np.clip(quant_error * 5 // 16, 0, 255)
                 if x < width - 1:
-                    image[y + 1, x + 1] += quant_error * 1 // 16
+                    image[y + 1, x + 1] += np.clip(quant_error * 1 // 16, 0, 255)
     return output_image
+
 
 def burkes_dithering(image, num_shades):
     height, width = image.shape[:2]
     output_image = np.zeros((height, width), dtype=np.uint8)
-    palette = np.linspace(0,255,num_shades)
-    gray_image = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+    palette = np.linspace(0, 255, num_shades)
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     for y in range(height):
         for x in range(width):
             old_pixel = gray_image[y, x]
-            new_pixel = np.argmin(np.abs(old_pixel-palette))
+            new_pixel = np.argmin(np.abs(old_pixel - palette))
             output_image[y, x] = palette[new_pixel]
 
             quant_error = old_pixel - new_pixel * 255 // (num_shades - 1)
             
             if x < width - 1:
-                image[y, x + 1] += quant_error * 8 // 32
+                image[y, x + 1] += (quant_error * 8 // 32).clip(0, 255)
             if x < width - 2:
-                image[y, x + 2] += quant_error * 4 // 32
+                image[y, x + 2] += (quant_error * 4 // 32).clip(0, 255)
             if y < height - 1:
                 if x > 1:
-                    image[y + 1, x - 2] += quant_error * 2 // 32
+                    image[y + 1, x - 2] += (quant_error * 2 // 32).clip(0, 255)
                 if x > 0:
-                    image[y + 1, x - 1] += quant_error * 4 // 32
-                image[y + 1, x] += quant_error * 8 // 32
+                    image[y + 1, x - 1] += (quant_error * 4 // 32).clip(0, 255)
+                image[y + 1, x] += (quant_error * 8 // 32).clip(0, 255)
                 if x < width - 1:
-                    image[y + 1, x + 1] += quant_error * 4 // 32
+                    image[y + 1, x + 1] += (quant_error * 4 // 32).clip(0, 255)
                 if x < width - 2:
-                    image[y + 1, x + 2] += quant_error * 2 // 32
+                    image[y + 1, x + 2] += (quant_error * 2 // 32).clip(0, 255)
     return output_image
+
 
 def main():
     img = cv2.imread("lena.tif")
@@ -129,11 +131,11 @@ def main():
     cv2.imwrite("custom_number_of_grey_shades_greyscale_img.jpg", greyscale_img)
 
     #7 floyd steinberg dithering
-    greyscale_img = floyd_steinberg_dithering(img, 128)
+    greyscale_img = floyd_steinberg_dithering(img, 2)
     cv2.imwrite("floyd_steinberg_dithering_greyscale_img.jpg", greyscale_img)
 
     #8 burkes dithering
-    greyscale_img = burkes_dithering(img, 128)
+    greyscale_img = burkes_dithering(img, 2)
     cv2.imwrite("burkes_dithering_greyscale_img.jpg", greyscale_img)
 
 if __name__ == "__main__":

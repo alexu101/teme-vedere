@@ -83,22 +83,45 @@ def task_b():
 
 def task_c():
     #c)
-    face_cascade = cv.CascadeClassifier(cv.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+    #using face detection specified alg
+
+    # face_cascade = cv.CascadeClassifier(cv.data.haarcascades + 'haarcascade_frontalface_default.xml')
+    # img = cv.imread("pic.jpg")
+    # faces = face_cascade.detectMultiScale(img, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+    # min_x, min_y, max_x, max_y = float('inf'), float('inf'), 0, 0
+    # for (x, y, w, h) in faces:
+    #     min_x = min(min_x, x)
+    #     min_y = min(min_y, y)
+    #     max_x = max(max_x, x + w)
+    #     max_y = max(max_y, y + h)
+    # face_image = img.copy()
+    # cv.rectangle(face_image, (min_x, min_y), (max_x, max_y), (0, 255, 0), 2)
+    # cv.imshow("face",face_image)
+    # cv.waitKey(0)
+
+    #not using face detection specified alg
     img = cv.imread("pic.jpg")
-    faces = face_cascade.detectMultiScale(img, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+    img_detection_1 = skin_detection_rgb(img)
+    img_detection_2 = skin_detection_hsv(img)
+    img_detection_3 = skin_detection_ycrcb(img)
+    merged_results = np.logical_or(np.logical_or(img_detection_1, img_detection_2), img_detection_3)
+    contours, _ = cv.findContours(merged_results.astype(np.uint8), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
     min_x, min_y, max_x, max_y = float('inf'), float('inf'), 0, 0
-    for (x, y, w, h) in faces:
+    for contour in contours:
+        x, y, w, h = cv.boundingRect(contour)
         min_x = min(min_x, x)
         min_y = min(min_y, y)
         max_x = max(max_x, x + w)
         max_y = max(max_y, y + h)
-    face_image = img.copy()
-    cv.rectangle(face_image, (min_x, min_y), (max_x, max_y), (0, 255, 0), 2)
-    cv.imshow("face",face_image)
+    face_detection = img.copy()
+    cv.rectangle(face_detection, (min_x, min_y), (max_x, max_y), (0, 255, 0), 2)
+    cv.imshow("face_detection",face_detection)
     cv.waitKey(0)
 
+
 def main():
-    task_b()
+    task_c()
     
 
 if __name__ == '__main__':
